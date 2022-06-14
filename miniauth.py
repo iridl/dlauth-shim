@@ -1,5 +1,6 @@
 from flask import Flask, session, redirect, url_for, escape, request
 from simplepam import authenticate
+import urllib
 
 
 app = Flask(__name__)
@@ -15,16 +16,21 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        redirect_url = request.form['redirect']
         if authenticate(str(username), str(password)):
             session['username'] = request.form['username']
-            return redirect(url_for('index'))
+            return redirect(redirect_url)
         else:
             return 'Invalid username/password'
-    return '''
+
+    assert request.method == 'GET'
+    redirect_url = urllib.parse.unquote_plus(request.args.get('redirect'))
+    return f'''
         <form action="" method="post">
             <p><input type=text name=username>
             <p><input type=password name=password>
             <p><input type=submit value=Login>
+            <input name="redirect" type="text" value="{redirect_url}" hidden="">
         </form>
     '''
 
