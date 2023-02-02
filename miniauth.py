@@ -9,28 +9,36 @@ app.config.update(
     SESSION_COOKIE_NAME="__dlauth_id",
     PERMANENT_SESSION_LIFETIME=datetime.timedelta(days=1),
     #SESSION_COOKIE_SECURE=True, # only send over https
-    SESSION_COOKIE_HTTPONLY=False,
 )
 
 
-
 @app.route('/api/check') # ?ssid=abcde
-def index():
-    ssid = request.args.get('ssid')
-    ssid_serializer = app.session_interface.get_signing_serializer(app)
-    ssid_contents = ssid_serializer.loads(ssid) # todo max-age
-    print(ssid_contents)
+def check():
+    try:
+        ssid = request.args.get('ssid')
+        ssid_serializer = app.session_interface.get_signing_serializer(app)
+        max_age = int(app.permanent_session_lifetime.total_seconds())
+        ssid_contents = ssid_serializer.loads(ssid, max_age=max_age)
+    except:
+        ssid_contents = {}
     if 'username' in ssid_contents:
         response = dict(errcode=0, code=200, errstr="", redirect=None)
     else:
         response = dict(
             errcode=2,
             code=200,
-            errstr="missing credential",
+            errstr="missing or invalid credential",
             redirect=ingrid_url_for('login')
         )
-    print(response)
     return response
+
+
+@app.route('/whoami')
+def whoami():
+    username = session.get('username')
+    if username:
+        return f'logged in as {username}'
+    return 'not logged in'
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,16 +46,14 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        redirect_url = request.form['redirect']
+        redirect_url = request.form.get('redirect')
+        if not redirect_url:
+            redirect_url = url_for('whoami')
         if authenticate(username, password):
-            print('AUTHENICATION SUCESSFUL')
             session['username'] = username
             session.permanent = True
-            for k, v in session.items():
-                print(k, v)
             return redirect(redirect_url)
         else:
-            print('AUTH FAILED')
             return redirect(ingrid_url_for('login', redirect=redirect_url))
  
     assert request.method == 'GET'
@@ -66,7 +72,7 @@ def login():
 def logout():
     # remove the username from the session if it's there
     session.pop('username', None)
-    return redirect(ingrid_url_for('index'))
+    return redirect(url_for('login'))
 
 
 @app.route('/key')
