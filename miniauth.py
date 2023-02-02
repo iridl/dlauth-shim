@@ -76,11 +76,11 @@ def logout():
 
 
 @app.route('/key')
-def api_credential():
+def key():
     if 'username' in session:
         key = request.cookies[app.config['SESSION_COOKIE_NAME']]
         return(key)
-    return redirect(ingrid_url_for('login', redirect=ingrid_url_for('api_credential')))
+    return redirect(ingrid_url_for('login', redirect=ingrid_url_for('key')))
 
 
 def ingrid_url_for(method, **kwargs):
