@@ -93,7 +93,7 @@ querystring is present, because Ingrid never adds one.'''
 
 
 def authenticate(user, password):
-    if user == 'aaron' and password == 'thepass':
+    if user == 'testuser' and password == 'thepass':
         return True
     return False
 
