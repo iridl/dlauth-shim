@@ -1,0 +1,8 @@
+name: fbfmaproom2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pip  # to support compilation of mod_wsgi from source
+  - pip:
+    - flask
