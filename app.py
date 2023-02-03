@@ -15,6 +15,13 @@ app.config.update(
 @app.route('/api/check') # ?ssid=abcde
 def check():
     try:
+        # Unpack session cookie and verify signature. This is copied
+        # from flask's open_session method [1]. Ordinarily this
+        # happens automatically and transparently, but here we have to
+        # do it explicitly because ingrid sends the session string as
+        # a querystring argument rather than a cookie.
+        #
+        # [1]  https://github.com/pallets/flask/blob/cfd5783a984c81828e79641b5d761a56633fa0e8/src/flask/sessions.py#L363-L374
         ssid = request.args.get('ssid')
         ssid_serializer = app.session_interface.get_signing_serializer(app)
         max_age = int(app.permanent_session_lifetime.total_seconds())
