@@ -43,7 +43,7 @@ COPY docker/httpd.conf /etc/httpd/conf/httpd.conf
 RUN chmod g+rwx /run/httpd
 
 # install application
-COPY miniauth.py docker/app.wsgi docker/entrypoint docker/service /app/
+COPY app.py docker/app.wsgi docker/entrypoint docker/service /app/
 
 USER apache:apache
 WORKDIR /app

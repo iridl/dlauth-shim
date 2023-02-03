@@ -1,2 +1,2 @@
-import miniauth
-application = miniauth.app
+import app
+application = app.app
