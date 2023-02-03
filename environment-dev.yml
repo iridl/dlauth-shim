@@ -1,0 +1,8 @@
+name: dlauth-shim
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - conda-lock
+  - pytest
+category: dev
